@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dream Translator</title>
+<meta name="description" content="Share your dreams and feedback for the thesis project Dream Translator x Interactive Space.">
+<meta property="og:title" content="Dream Translator x Interactive Space">
+<meta property="og:description" content="Help me turn dreams into space. A short, dreamy survey for my thesis 💭✨">
+<meta property="og:image" content="design-sketch.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,800;1,800&family=Inter:wght@400;500;600&family=Huninn&family=M+PLUS+Rounded+1c:wght@700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #0d0f24;
+    --bg-2: #1c1940;
+    --bg-3: #3a2b5c;
+    --ink: #f6f4e9;
+    --ink-soft: #c9c5dd;
+    --ink-faint: #8b87a8;
+    --gold: #d3c78f;
+    --rose: #e0a6b3;
+    --sky: #8fb5c4;
+    --card: rgba(255, 255, 255, 0.06);
+    --card-line: rgba(255, 255, 255, 0.14);
+    --card-hover: rgba(255, 255, 255, 0.11);
+    --chosen: rgba(211, 199, 143, 0.18);
+    --danger: #ffb4a8;
+    --font-body: Inter, system-ui, sans-serif;
+    --font-head: "Arial Rounded MT Bold", "Arial Rounded MT", Nunito, sans-serif;
+  }
+  /* Latin text keeps the same fonts; CJK characters fall through to a matching rounded/sans font */
+  html:lang(zh-Hant) {
+    --font-body: Inter, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    --font-head: "Arial Rounded MT Bold", "Arial Rounded MT", Nunito, Huninn, "PingFang TC", "Noto Sans TC", sans-serif;
+  }
+  html:lang(ja) {
+    --font-body: Inter, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+    --font-head: "Arial Rounded MT Bold", "Arial Rounded MT", Nunito, "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", sans-serif;
+  }
+  html:lang(zh-Hant) body, html:lang(ja) body { line-height: 1.75; }
+  html:lang(zh-Hant) .eyebrow, html:lang(ja) .eyebrow { letter-spacing: .08em; }
+  html:lang(zh-Hant) .thesis, html:lang(ja) .thesis { font-style: normal; }
+  html:lang(zh-Hant) h1, html:lang(zh-Hant) h2, html:lang(ja) h1, html:lang(ja) h2 { line-height: 1.35; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 120%, var(--bg-3) 0%, var(--bg-2) 45%, var(--bg-1) 100%) fixed;
+    background-color: var(--bg-1);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  #sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(70px); opacity: .35; z-index: 0; pointer-events: none;
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  .blob.a { width: 420px; height: 420px; background: var(--rose); top: -120px; left: -140px; }
+  .blob.b { width: 360px; height: 360px; background: var(--sky); bottom: -140px; right: -120px; animation-delay: -8s; }
+  @keyframes drift { to { transform: translate(60px, 40px) scale(1.15); } }
+
+  main {
+    position: relative; z-index: 1;
+    min-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 72px 16px 96px;
+  }
+  .scene {
+    width: 100%; max-width: 640px;
+    display: none;
+    animation: rise .7s cubic-bezier(.2,.7,.2,1);
+  }
+  .scene.active { display: block; }
+  .scene.leaving { animation: fade-up .35s ease forwards; }
+  @keyframes rise { from { opacity: 0; transform: translateY(24px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes fade-up { to { opacity: 0; transform: translateY(-20px); filter: blur(6px); } }
+
+  .eyebrow {
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold);
+    margin: 0 0 14px; font-weight: 600;
+  }
+  h1, h2 { font-family: var(--font-head); font-weight: 700; margin: 0 0 18px; line-height: 1.15; }
+  h1 { font-size: clamp(36px, 8vw, 58px); }
+  h1 em { font-style: italic; color: var(--gold); }
+  h2 { font-size: clamp(24px, 5vw, 32px); }
+  p { margin: 0 0 14px; color: var(--ink-soft); }
+  .hint { font-size: 14px; color: var(--ink-faint); margin-top: -6px; }
+  .req { color: var(--rose); font-size: 13px; margin-left: 4px; }
+
+  .sketch {
+    width: 100%; border-radius: 14px; margin: 8px 0 18px; display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    cursor: zoom-in;
+  }
+  .thesis {
+    border-left: 2px solid var(--gold); padding: 6px 0 6px 16px; margin: 22px 0;
+    font-family: var(--font-head); font-weight: 700; font-style: italic; font-size: 20px; color: var(--ink);
+  }
+
+  .options { display: grid; gap: 10px; margin: 22px 0 8px; }
+  .opt {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; text-align: left;
+    padding: 14px 16px; border-radius: 14px;
+    background: var(--card); border: 1px solid var(--card-line); color: var(--ink);
+    font: inherit; cursor: pointer;
+    transition: background .2s, border-color .2s, transform .15s;
+  }
+  .opt:hover { background: var(--card-hover); transform: translateX(3px); }
+  .opt:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .opt .mark {
+    flex: none; width: 22px; height: 22px; border: 1.5px solid var(--ink-faint);
+    display: grid; place-items: center; transition: all .2s;
+  }
+  .opt[data-kind="radio"] .mark { border-radius: 50%; }
+  .opt[data-kind="check"] .mark { border-radius: 6px; }
+  .opt .key {
+    margin-left: auto; font-size: 12px; color: var(--ink-faint);
+    border: 1px solid var(--card-line); border-radius: 6px; padding: 1px 7px;
+  }
+  .opt[aria-checked="true"] { background: var(--chosen); border-color: var(--gold); }
+  .opt[aria-checked="true"] .mark { border-color: var(--gold); background: var(--gold); box-shadow: 0 0 14px var(--gold); }
+  .opt[aria-checked="true"] .mark::after { content: "✦"; color: var(--bg-1); font-size: 12px; }
+
+  input[type="text"], textarea {
+    width: 100%; font: inherit; color: var(--ink);
+    background: var(--card); border: 1px solid var(--card-line); border-radius: 14px;
+    padding: 14px 16px; margin-top: 18px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]::placeholder, textarea::placeholder { color: var(--ink-faint); }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(211,199,143,.15); }
+  textarea { min-height: 180px; resize: vertical; }
+  .other-input { margin-top: 2px; display: none; }
+  .other-input.show { display: block; }
+
+  .nav { display: flex; align-items: center; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+  .btn {
+    font: inherit; font-weight: 600; cursor: pointer;
+    padding: 13px 26px; border-radius: 999px; border: none;
+    background: var(--gold); color: var(--bg-1);
+    box-shadow: 0 6px 24px rgba(211,199,143,.25);
+    transition: transform .15s, box-shadow .2s, opacity .2s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(211,199,143,.4); }
+  .btn:disabled { opacity: .5; cursor: wait; transform: none; }
+  .btn.ghost { background: transparent; color: var(--ink-soft); box-shadow: none; border: 1px solid var(--card-line); }
+  .enter-hint { font-size: 13px; color: var(--ink-faint); }
+  .error { color: var(--danger); font-size: 14px; margin-top: 12px; min-height: 1em; }
+
+  .door {
+    width: 120px; height: 180px; margin: 0 auto 30px; position: relative;
+    border: 2px solid var(--gold); border-radius: 60px 60px 4px 4px;
+    box-shadow: 0 0 40px rgba(211,199,143,.3), inset 0 0 40px rgba(211,199,143,.15);
+    perspective: 400px;
+  }
+  .door .leaf {
+    position: absolute; inset: 6px; border-radius: 54px 54px 2px 2px;
+    background: linear-gradient(160deg, #2c2650, #15132e);
+    transform-origin: left center; transition: transform 1.2s cubic-bezier(.3,.7,.2,1);
+  }
+  .door .leaf::after {
+    content: ""; position: absolute; right: 14px; top: 52%; width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+  }
+  .door .glow {
+    position: absolute; inset: 6px; border-radius: 54px 54px 2px 2px;
+    background: radial-gradient(circle at 50% 60%, #fff8d8, var(--gold) 40%, transparent 75%);
+    opacity: 0; transition: opacity 1.2s;
+  }
+  .door.open .leaf { transform: rotateY(-75deg); }
+  .door.open .glow { opacity: 1; }
+  .center { text-align: center; }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; pointer-events: none;
+  }
+  .topbar > * { pointer-events: auto; }
+  .progress { display: flex; gap: 8px; opacity: 0; transition: opacity .4s; }
+  .lang {
+    display: flex; gap: 2px; padding: 3px; border-radius: 999px;
+    background: rgba(13,15,36,.6); border: 1px solid var(--card-line);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  }
+  .lang button {
+    font: inherit; font-size: 13px; line-height: 1.2; padding: 6px 11px; border-radius: 999px; border: 0;
+    background: transparent; color: var(--ink-soft); cursor: pointer; transition: background .2s, color .2s;
+  }
+  .lang button:hover { color: var(--ink); }
+  .lang button:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .lang button[aria-pressed="true"] { background: var(--gold); color: var(--bg-1); font-weight: 600; }
+  .progress.show { opacity: 1; }
+  .progress span {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--card-line); transition: all .3s;
+  }
+  .progress span.done { background: var(--ink-faint); }
+  .progress span.now { background: var(--gold); box-shadow: 0 0 10px var(--gold); transform: scale(1.4); }
+
+  .lightbox {
+    position: fixed; inset: 0; z-index: 10; background: rgba(5,5,15,.92);
+    display: none; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+    padding: 64px 16px 32px;
+  }
+  .lightbox.show { display: block; }
+  /* margin:auto centers when the image fits and still lets it scroll from the top-left edge when it doesn't */
+  .lightbox .frame { display: flex; min-width: 100%; min-height: 100%; width: max-content; }
+  .lightbox img {
+    margin: auto; display: block; border-radius: 10px; cursor: zoom-in;
+    max-width: 100%; max-height: calc(100vh - 96px); width: auto; height: auto;
+  }
+  .lightbox.zoomed .frame { width: max-content; }
+  .lightbox.zoomed img { max-width: none; max-height: none; width: auto; cursor: zoom-out; }
+  .lightbox .close {
+    position: fixed; top: 14px; right: 16px; z-index: 11;
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--card-line);
+    background: rgba(13,15,36,.8); color: var(--ink); font-size: 22px; line-height: 1; cursor: pointer;
+  }
+  .lightbox .zoom-hint {
+    position: fixed; top: 22px; left: 16px; z-index: 11; margin: 0;
+    font-size: 13px; color: var(--ink-soft); background: rgba(13,15,36,.8); padding: 4px 10px; border-radius: 999px;
+  }
+  body.no-scroll { overflow: hidden; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 480px) {
+    .opt .key { display: none; }
+    .enter-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div class="blob a"></div>
+<div class="blob b"></div>
+<div class="topbar">
+  <div class="progress" id="progress"></div>
+  <div class="lang" id="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en" lang="en">EN</button>
+    <button type="button" data-lang="zh-Hant" lang="zh-Hant">繁中</button>
+    <button type="button" data-lang="ja" lang="ja">日本語</button>
+  </div>
+</div>
+
+<main id="app">
+  <!-- Intro -->
+  <section class="scene active" data-scene="intro">
+    <p class="eyebrow" data-i18n="introEyebrow"></p>
+    <h1 data-i18n-html="title"></h1>
+    <p data-i18n="intro1"></p>
+    <p data-i18n="intro2"></p>
+    <p data-i18n-html="intro3"></p>
+    <div class="nav">
+      <button class="btn" data-next data-i18n="stepInside"></button>
+      <span class="enter-hint" data-i18n="duration"></span>
+    </div>
+  </section>
+
+  <!-- Sketch -->
+  <section class="scene" data-scene="sketch">
+    <p class="eyebrow" data-i18n="sketchEyebrow"></p>
+    <h2 data-i18n="sketchTitle"></h2>
+    <img class="sketch" src="design-sketch.jpg" data-i18n-src="sketchSrc" data-i18n-alt="sketchAlt" id="sketchImg">
+    <p class="hint" data-i18n="sketchHint"></p>
+    <div class="thesis" data-i18n="thesis"></div>
+    <p data-i18n="borrow"></p>
+    <div class="nav">
+      <button class="btn ghost" data-back data-i18n="back"></button>
+      <button class="btn" data-next data-i18n="begin"></button>
+    </div>
+  </section>
+
+  <div id="questions"></div>
+
+  <!-- Thank you -->
+  <section class="scene" data-scene="done">
+    <div class="center">
+      <div class="door" id="door"><div class="glow"></div><div class="leaf"></div></div>
+      <p class="eyebrow" data-i18n="sentEyebrow"></p>
+      <h1 data-i18n="thanks"></h1>
+      <p data-i18n="thanksBody"></p>
+    </div>
+  </section>
+</main>
+
+<div class="lightbox" id="lightbox" role="dialog" data-i18n-aria="sketchEyebrow">
+  <p class="zoom-hint" data-i18n="zoomHint"></p>
+  <button class="close" type="button" data-i18n-aria="close">×</button>
+  <div class="frame"><img src="design-sketch.jpg" data-i18n-src="sketchSrc" data-i18n-alt="sketchAlt"></div>
+</div>
+
+<script>
+// Answers are posted to the original Google Form, so they show up in its Responses tab / linked Sheet.
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSdPTS-TYU53kBDqQ93eXE7daIMnJY3ZB1Jr3p8JAw-asFdcpQ/formResponse";
+const DRAFT_KEY = "dream-survey-draft-v1";
+const LANG_KEY = "dream-survey-lang";
+const HTML_LANG = { en: "en", zh: "zh-Hant", ja: "ja" };
+
+// ---------- UI text ----------
+const STR = {
+  introEyebrow: { en: "Thesis Survey · GWU Interaction Design", zh: "論文想法調查 · 喬治華盛頓大學 · 互動設計科", ja: "修士論文アンケート · GWU インタラクションデザイン" },
+  title: { en: "Dream Translator <em>×</em> Interactive Space", zh: "夢境翻譯器 <em>×</em> 互動空間", ja: "Dream Translator <em>×</em> Interactive Space" },
+  intro1: {
+    en: "Hi! I'm Sonia, a 2nd year master's student in Interaction Design at GWU. I'd love to hear your thoughts, feedback, or anything you'd like to share about my thesis idea.",
+    zh: "哈囉！我是 Sonia，GWU 互動設計碩士二年級的學生。這份問卷是想聽聽你對我的論文構想有什麼想法、回饋，或任何想分享的事。",
+    ja: "こんにちは！GWU でインタラクションデザインを学んでいる修士2年生のゆうるです。私の修士論文のアイデアについて、感想やフィードバックなど、なんでも聞かせてもらえたら嬉しいです。" },
+  intro2: {
+    en: "It's a theatrical installation that turns individual dreams into collective, simultaneous movements and actions. It's meant to be a space where people can share their dreams in a new way, including people who rarely dream or find their dreams hard to put into words.",
+    zh: "這是一個劇場式裝置，把個人的夢境轉化為集合的、同步的動作與行為。我希望創造一個空間讓大家用不同的方式來分享夢境，包括很少做夢、或很難用言語描述夢境分享給他人的人。",
+    ja: "これは一人ひとりの夢を集め、動きやアクションへと変換し、みんなで体験できる劇場的なインスタレーションです。あまり夢を見ない人や、夢を言葉にするのが難しい人も含めて、新しい方法で夢を共有できる空間をつくりたいと考えている設計です。" },
+  intro3: {
+    en: "It's still early, and the final piece will be shown at GWU's <em>NEXT Festival</em> in May 2027. Any feedback helps. Have a good dream tonight 💭✨",
+    zh: "我的設計目前還在初期階段，最終作品將於 2027 年 5 月在 GWU 的 <em>NEXT Festival</em> 展出。任何回饋都很有幫助。祝你今晚好夢 💭✨",
+    ja: "今はまだ初期段階で、完成作品は2027年5月に GWU の <em>NEXT Festival</em> で展示する予定です。どんなフィードバックも大歓迎です。今夜もいい夢を 💭✨" },
+  stepInside: { en: "Step inside →", zh: "開始回答 →", ja: "夢に入る →" },
+  duration: { en: "takes about 5 minutes", zh: "大約需要 5 分鐘", ja: "所要時間 約5分" },
+  sketchEyebrow: { en: "The design sketch", zh: "設計草圖", ja: "デザインスケッチ" },
+  sketchTitle: { en: "Here's what I'm imagining", zh: "這是我想像中的樣子", ja: "こんなイメージを考えています" },
+  sketchAlt: {
+    en: "Hand-drawn sketch of the installation: visitors input a dream on an iPad, walk ten steps on a walking machine to open a door, wave to reveal dream imagery behind trees and grass, while candles release different fragrances.",
+    zh: "裝置的手繪草圖：觀眾在 iPad 上輸入夢境，在步行機上走十步打開一扇門，揮手讓夢境影像從樹木與草叢後浮現，同時蠟燭散發出不同的香氣。",
+    ja: "インスタレーションの手描きスケッチ：来場者は iPad に夢を入力し、ウォーキングマシンで10歩歩いてドアを開け、手を振ると木々や草の向こうに夢の映像が現れ、キャンドルからはさまざまな香りが漂う。" },
+  sketchSrc: { en: "design-sketch.jpg", zh: "design-sketch-zh.jpg", ja: "design-sketch-ja.jpg" },
+  sketchHint: { en: "Tap the sketch to zoom in.", zh: "點擊草圖可以放大。", ja: "スケッチをタップすると拡大できます。" },
+  thesis: {
+    en: "How might we translate an internal subjective experience into an external space?",
+    zh: "我們如何將內在的主觀經驗，轉化為外在的空間？",
+    ja: "内面の主観的体験を外的空間へと翻訳する方法についての考察" },
+  borrow: {
+    en: "Please let me borrow your amazing ideas to make this design better!! : ))",
+    zh: "請借我你們超棒的點子，讓這個設計變得更好！！: ))",
+    ja: "このデザインをもっと良くするために、みなさんの素敵なアイデアを貸してください！！: ))" },
+  back: { en: "← Back", zh: "← 上一步", ja: "← 戻る" },
+  begin: { en: "Let's begin", zh: "開始吧", ja: "はじめる" },
+  next: { en: "Next →", zh: "下一步 →", ja: "次へ →" },
+  send: { en: "Send my dream ✦", zh: "送出我的夢 ✦", ja: "夢を送る ✦" },
+  sending: { en: "Sending…", zh: "傳送中…", ja: "送信中…" },
+  enterHint: { en: "or press Enter ↵", zh: "或按 Enter ↵", ja: "または Enter ↵" },
+  pickAll: { en: "Pick all that apply.", zh: "可複選。", ja: "当てはまるものをすべて選んでください。" },
+  other: { en: "Other", zh: "其他", ja: "その他" },
+  otherPlaceholder: { en: "Tell me more…", zh: "多說一點…", ja: "詳しく教えてください…" },
+  errRequired: { en: "This one's required, just a few words is fine ✦", zh: "這題是必填的，寫幾個字就可以 ✦", ja: "この質問は必須です。ひとことでも大丈夫です ✦" },
+  errPick: { en: "Pick at least one option ✦", zh: "請至少選一個選項 ✦", ja: "少なくとも1つ選んでください ✦" },
+  errOther: { en: "Tell me a bit about your “Other” answer ✦", zh: "請簡單說明你的「其他」答案 ✦", ja: "「その他」の内容を少し教えてください ✦" },
+  errNetwork: {
+    en: "Hmm, that didn't send. Check your connection and try again.",
+    zh: "嗯…好像沒有送出成功，請檢查網路後再試一次。",
+    ja: "うまく送信できませんでした。接続を確認して、もう一度お試しください。" },
+  sentEyebrow: { en: "Sent ✦", zh: "已送出 ✦", ja: "送信しました ✦" },
+  thanks: { en: "Thank you!", zh: "謝謝你！", ja: "ありがとうございます！" },
+  thanksBody: {
+    en: "Your dream is safe with me. Thanks for helping shape this project. Have a good dream tonight 💭✨",
+    zh: "你的夢我會好好珍藏。謝謝你幫助我完成這個計畫。祝你今晚好夢 💭✨",
+    ja: "あなたの夢は大切にお預かりします。このプロジェクトに協力してくれてありがとう。今夜もいい夢を 💭✨" },
+  zoomHint: { en: "Tap the image to zoom · scroll to explore", zh: "點擊圖片放大 · 滑動瀏覽", ja: "画像をタップで拡大 · スクロールで移動" },
+  close: { en: "Close", zh: "關閉", ja: "閉じる" },
+};
+
+// Option `v` values must match the Google Form's choices exactly (in English), whatever language is shown.
+const QUESTIONS = [
+  { id: "describe", entry: "1449005772", type: "short", required: true,
+    eyebrow: { en: "About you", zh: "關於你", ja: "あなたについて" },
+    title: { en: "How do I describe you?", zh: "我該怎麼形容你？", ja: "あなたはどんな人ですか？" },
+    placeholder: { en: "e.g. 20s, design student", zh: "例如：20 多歲、設計系學生", ja: "例：20代、デザイン学生" } },
+  { id: "name", entry: "1685270148", type: "short", required: false,
+    eyebrow: { en: "About you", zh: "關於你", ja: "あなたについて" },
+    title: { en: "Name", zh: "名字", ja: "お名前" },
+    hint: { en: "Only if you'd like to tell me who you are haha", zh: "如果你願意讓我知道你是誰的話 哈哈", ja: "どうしても名前を教えてあげたいなら（笑）" },
+    placeholder: { en: "Totally optional", zh: "完全可以不填", ja: "空欄でもOKです" } },
+  { id: "often", entry: "1842912509", type: "check", required: true, other: true,
+    eyebrow: { en: "Your dreams", zh: "你的夢", ja: "あなたの夢" },
+    title: { en: "How often do you dream?", zh: "你多常做夢？", ja: "どのくらいの頻度で夢を見ますか？" },
+    options: [
+      { v: "Almost every day", zh: "幾乎每天", ja: "ほぼ毎日" },
+      { v: "3~5 days/week", zh: "每週 3~5 天", ja: "週3〜5日" },
+      { v: "1~2 days/week", zh: "每週 1~2 天", ja: "週1〜2日" },
+      { v: "I don't really remember", zh: "我不太記得", ja: "あまり覚えていない" },
+    ] },
+  { id: "remember", entry: "1693510977", type: "check", required: true, other: true,
+    eyebrow: { en: "Your dreams", zh: "你的夢", ja: "あなたの夢" },
+    title: { en: "How much of your dream can you remember after you wake up?", zh: "醒來之後，你能記得多少夢的內容？", ja: "目が覚めたあと、夢をどのくらい覚えていますか？" },
+    options: [
+      { v: "Most of them", zh: "大部分都記得", ja: "ほとんど覚えている" },
+      { v: "Some parts", zh: "記得一部分", ja: "一部だけ" },
+      { v: "Only a few moments", zh: "只記得幾個片段", ja: "ほんの一瞬だけ" },
+      { v: "Hmmm...did I dream last night??", zh: "嗯…我昨晚有做夢嗎？？", ja: "うーん…昨日の夜、夢見たっけ？？" },
+    ] },
+  { id: "input", entry: "262002855", type: "check", required: true, other: true,
+    eyebrow: { en: "Layer 1 · Dream input", zh: "第 1 層 · 夢境輸入", ja: "レイヤー1 · 夢の入力" },
+    title: {
+      en: "Visitors input the dreams they'd like to see at STEP 1. Which ways work best?",
+      zh: "在 STEP 1，觀眾會輸入他們想看到的夢。哪些方式最適合？",
+      ja: "STEP 1 では、来場者が見たい夢を入力します。どの方法が合っていると思いますか？" },
+    hint: { en: "What do you think of the idea?", zh: "你覺得這個點子怎麼樣？", ja: "このアイデアについてどう思いますか？" },
+    options: [
+      { v: "text/ typing words", zh: "文字／打字", ja: "テキスト／文字入力" },
+      { v: "voice recording", zh: "語音錄音", ja: "音声録音" },
+      { v: "drawing", zh: "繪畫", ja: "絵を描く" },
+      { v: "upload/choose photos", zh: "上傳／選擇照片", ja: "写真をアップロード／選ぶ" },
+      { v: "choose color palette", zh: "選擇色彩組合", ja: "カラーパレットを選ぶ" },
+    ] },
+  { id: "medium", entry: "1369130152", type: "long", required: true,
+    eyebrow: { en: "Layer 2 · Medium", zh: "第 2 層 · 媒材", ja: "レイヤー2 · メディウム" },
+    title: {
+      en: "Should I recreate your dreams from the inputs above, or use an AI image generator?",
+      zh: "我應該根據上面的輸入方式來重現你的夢，還是使用 AI 圖像生成器？",
+      ja: "上の入力方法をもとに私が夢を再現するべきか、それとも AI 画像生成を取り入れるべきでしょうか？" },
+    hint: {
+      en: "An AI image generator could create a wider variety of dream-inspired visuals in less time during the exhibition.",
+      zh: "AI 圖像生成器可以在展覽期間，用更短的時間創造出更多樣的夢境視覺。",
+      ja: "AI 画像生成を使えば、展示期間中により短い時間で、より多様な夢のビジュアルをつくれます。" },
+    placeholder: { en: "Tell me what you think…", zh: "告訴我你的想法…", ja: "あなたの考えを教えてください…" } },
+  { id: "texture", entry: "358830179", type: "check", required: true, other: true,
+    eyebrow: { en: "Layer 3 · Spatial design", zh: "第 3 層 · 空間設計", ja: "レイヤー3 · 空間デザイン" },
+    title: {
+      en: "What texture would work best for the floor, walls, and ceiling?",
+      zh: "你覺得地板、牆面和天花板適合用什麼樣的材質？",
+      ja: "床・壁・天井には、どんな質感が合うと思いますか？" },
+    options: [
+      { v: "Soft, flowing fabric", zh: "柔軟飄逸的布料", ja: "やわらかく流れるような布" },
+      { v: "Layered paper and translucent textures", zh: "層疊的紙張與半透明材質", ja: "重なった紙と半透明の素材" },
+      { v: "Water-like projections", zh: "如水般的投影", ja: "水のようなプロジェクション" },
+      { v: "Reflective surfaces", zh: "反光表面", ja: "反射する素材" },
+      { v: "Wood, grass, nature elements", zh: "木頭、草地等自然元素", ja: "木や草などの自然素材" },
+    ] },
+  { id: "dream", entry: "1258092136", type: "long", required: true,
+    eyebrow: { en: "Layer 4 · Dream content", zh: "第 4 層 · 夢境內容", ja: "レイヤー4 · 夢の内容" },
+    title: {
+      en: "What dream has stayed with you so vividly that you'd love to experience it again in this space?",
+      zh: "有哪個夢讓你印象深刻到，很想在這個空間裡再體驗一次？",
+      ja: "もう一度この空間で体験したいと思うほど、鮮明に心に残っている夢はありますか？" },
+    hint: {
+      en: "Was it about your wishes, personal goals, family, friends, or pets? Was it abstract, fantastical, frightening, funny, joyful, sad, or unforgettable for another reason? Describe it in as much detail as you can.",
+      zh: "它跟你的願望、個人目標、家人、朋友或寵物有關嗎？是抽象、奇幻、可怕、好笑、開心、悲傷，還是因為其他原因讓你難忘？請盡可能詳細地描述你的夢。",
+      ja: "それは願いや目標、家族、友だち、ペットに関係する夢でしたか？抽象的、幻想的、怖い、おもしろい、うれしい、悲しい、あるいは別の理由で忘れられない夢でしたか？できるだけ詳しく教えてください。" },
+    placeholder: { en: "I was standing in…", zh: "我站在…", ja: "私は…に立っていて" } },
+  { id: "other", entry: "484415981", type: "long", required: false, last: true,
+    eyebrow: { en: "Layer 5 · Any other thoughts?", zh: "第 5 層 · 其他想法？", ja: "レイヤー5 · ほかに何か？" },
+    title: { en: "Anything else you'd like to tell me?", zh: "還有什麼想告訴我的嗎？", ja: "ほかに伝えたいことはありますか？" },
+    hint: {
+      en: "About this project, your dreams, or any random thoughts. Don't worry, your response can be completely anonymous 😊",
+      zh: "關於這個計畫、你的夢，或任何突然想到的事都可以。別擔心，你的回答可以完全匿名 😊",
+      ja: "このプロジェクトのこと、あなたの夢、ふと思いついたことなど、なんでもどうぞ。回答は完全に匿名でも大丈夫です 😊" },
+    placeholder: { en: "Optional", zh: "選填", ja: "任意" } },
+];
+
+// ---------- Language ----------
+function pickInitialLang() {
+  const fromUrl = new URLSearchParams(location.search).get("lang");
+  if (fromUrl in HTML_LANG) return fromUrl;
+  try { const saved = localStorage.getItem(LANG_KEY); if (saved in HTML_LANG) return saved; } catch (e) {}
+  for (const l of navigator.languages || [navigator.language || ""]) {
+    if (/^zh/i.test(l)) return "zh";
+    if (/^ja/i.test(l)) return "ja";
+    if (/^en/i.test(l)) return "en";
+  }
+  return "en";
+}
+let lang = pickInitialLang();
+const tr = obj => (obj && (obj[lang] || obj.en)) || "";
+const T = key => tr(STR[key]);
+const optLabel = o => (lang === "en" ? o.v : o[lang]) || o.v;
+
+let answers = {};
+try { answers = JSON.parse(localStorage.getItem(DRAFT_KEY)) || {}; } catch (e) {}
+const saveDraft = () => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(answers)); } catch (e) {} };
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ---------- Build question scenes ----------
+// Text is filled in by applyLang(), so switching language never touches what people have typed or picked.
+const qWrap = document.getElementById("questions");
+QUESTIONS.forEach((q, i) => {
+  const s = document.createElement("section");
+  s.className = "scene";
+  s.dataset.scene = q.id;
+  let body = "";
+  if (q.type === "short") {
+    body = `<input type="text" data-field autocomplete="off">`;
+  } else if (q.type === "long") {
+    body = `<textarea data-field></textarea>`;
+  } else {
+    const opts = [...q.options, ...(q.other ? [{ v: "Other" }] : [])];
+    body = `<div class="options" role="group">` +
+      opts.map((o, k) => `<button type="button" class="opt" role="checkbox" data-kind="${q.type}" data-value="${esc(o.v)}" aria-checked="false"><span class="mark"></span><span class="opt-label"></span><span class="key">${k + 1}</span></button>`).join("") +
+      `</div>` +
+      (q.other ? `<input type="text" class="other-input" data-other autocomplete="off">` : "");
+  }
+  s.innerHTML = `
+    <p class="eyebrow"><span class="q-eyebrow"></span> · ${i + 1}/${QUESTIONS.length}</p>
+    <h2><span class="q-title"></span>${q.required ? '<span class="req">*</span>' : ""}</h2>
+    ${q.hint ? `<p class="hint q-hint"></p>` : ""}
+    ${q.type === "check" ? '<p class="hint" data-i18n="pickAll"></p>' : ""}
+    ${body}
+    <div class="error" aria-live="polite"></div>
+    <div class="nav">
+      <button class="btn ghost" data-back data-i18n="back"></button>
+      <button class="btn" ${q.last ? 'data-submit data-i18n="send"' : 'data-next data-i18n="next"'}></button>
+      <span class="enter-hint"${q.type === "long" ? "" : ' data-i18n="enterHint"'}>${q.type === "long" ? "⌘/Ctrl + Enter" : ""}</span>
+    </div>`;
+  qWrap.appendChild(s);
+
+  // restore + wire inputs
+  const a = answers[q.id] || {};
+  const field = s.querySelector("[data-field]");
+  if (field) {
+    field.value = a.text || "";
+    field.addEventListener("input", () => { answers[q.id] = { text: field.value }; saveDraft(); });
+  }
+  const otherInput = s.querySelector("[data-other]");
+  const optBtns = [...s.querySelectorAll(".opt")];
+  const syncOpts = () => {
+    const chosen = answers[q.id]?.chosen || [];
+    optBtns.forEach(b => b.setAttribute("aria-checked", chosen.includes(b.dataset.value)));
+    if (otherInput) otherInput.classList.toggle("show", chosen.includes("Other"));
+  };
+  optBtns.forEach(b => b.addEventListener("click", () => toggleOpt(q, b.dataset.value)));
+  if (otherInput) {
+    otherInput.value = a.other || "";
+    otherInput.addEventListener("input", () => {
+      answers[q.id] = { ...(answers[q.id] || { chosen: [] }), other: otherInput.value }; saveDraft();
+    });
+  }
+  q.sync = syncOpts;
+  q.scene = s;
+  if (optBtns.length) syncOpts();
+});
+
+function applyLang() {
+  document.documentElement.lang = HTML_LANG[lang];
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = T(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = T(el.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-src]").forEach(el => { const src = T(el.dataset.i18nSrc); if (el.getAttribute("src") !== src) el.src = src; });
+  document.querySelectorAll("[data-i18n-alt]").forEach(el => { el.alt = T(el.dataset.i18nAlt); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", T(el.dataset.i18nAria)); });
+  document.querySelectorAll("[data-err]").forEach(el => { el.textContent = T(el.dataset.err); });
+  QUESTIONS.forEach(q => {
+    const s = q.scene;
+    s.querySelector(".q-eyebrow").textContent = tr(q.eyebrow);
+    s.querySelector(".q-title").textContent = tr(q.title);
+    if (q.hint) s.querySelector(".q-hint").textContent = tr(q.hint);
+    const field = s.querySelector("[data-field]");
+    if (field) field.placeholder = tr(q.placeholder);
+    const other = s.querySelector("[data-other]");
+    if (other) other.placeholder = T("otherPlaceholder");
+    s.querySelectorAll(".opt").forEach(b => {
+      const o = q.options.find(o => o.v === b.dataset.value);
+      b.querySelector(".opt-label").textContent = o ? optLabel(o) : T("other");
+    });
+  });
+  document.querySelectorAll("#lang [data-lang]").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === HTML_LANG[lang]));
+}
+
+document.getElementById("lang").addEventListener("click", e => {
+  const b = e.target.closest("[data-lang]");
+  if (!b) return;
+  lang = Object.keys(HTML_LANG).find(k => HTML_LANG[k] === b.dataset.lang);
+  try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  // keep ?lang= in the address bar so a copied link opens in this language
+  const url = new URL(location.href);
+  url.searchParams.set("lang", lang);
+  history.replaceState(null, "", url);
+  applyLang();
+});
+applyLang();
+
+function setError(scene, key) {
+  const err = scene.querySelector(".error");
+  if (key) { err.dataset.err = key; err.textContent = T(key); }
+  else { delete err.dataset.err; err.textContent = ""; }
+}
+
+function toggleOpt(q, value) {
+  const cur = answers[q.id] || { chosen: [] };
+  let chosen = cur.chosen || [];
+  if (q.type === "radio") chosen = [value];
+  else chosen = chosen.includes(value) ? chosen.filter(v => v !== value) : [...chosen, value];
+  answers[q.id] = { ...cur, chosen };
+  saveDraft();
+  q.sync();
+  setError(q.scene, null);
+  if (value === "Other" && chosen.includes("Other")) q.scene.querySelector("[data-other]").focus();
+}
+
+// ---------- Navigation ----------
+const scenes = [...document.querySelectorAll(".scene")];
+const progress = document.getElementById("progress");
+progress.innerHTML = QUESTIONS.map(() => "<span></span>").join("");
+let idx = 0;
+
+function show(n) {
+  const cur = scenes[idx];
+  cur.classList.add("leaving");
+  setTimeout(() => {
+    cur.classList.remove("active", "leaving");
+    idx = n;
+    const next = scenes[idx];
+    next.classList.add("active");
+    window.scrollTo({ top: 0 });
+    const qi = QUESTIONS.findIndex(q => q.id === next.dataset.scene);
+    progress.classList.toggle("show", qi >= 0);
+    [...progress.children].forEach((d, k) => { d.className = k < qi ? "done" : k === qi ? "now" : ""; });
+    const focusEl = next.querySelector("[data-field]");
+    if (focusEl && matchMedia("(hover: hover)").matches) focusEl.focus({ preventScroll: true });
+  }, 330);
+}
+
+function validate(scene) {
+  const q = QUESTIONS.find(q => q.id === scene.dataset.scene);
+  if (!q) return true;
+  const a = answers[q.id] || {};
+  let key = null;
+  if (q.type === "short" || q.type === "long") {
+    if (q.required && !(a.text || "").trim()) key = "errRequired";
+  } else {
+    const chosen = a.chosen || [];
+    if (q.required && !chosen.length) key = "errPick";
+    else if (chosen.includes("Other") && !(a.other || "").trim()) key = "errOther";
+  }
+  setError(scene, key);
+  return !key;
+}
+
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-next]")) { if (validate(scenes[idx])) show(idx + 1); }
+  else if (e.target.closest("[data-back]")) show(idx - 1);
+  else if (e.target.closest("[data-submit]")) submit(e.target.closest("[data-submit]"));
+});
+
+document.addEventListener("keydown", e => {
+  const scene = scenes[idx];
+  const isTextarea = e.target.tagName === "TEXTAREA";
+  if (e.key === "Enter" && (!isTextarea || e.metaKey || e.ctrlKey) && !e.target.closest("button")) {
+    e.preventDefault();
+    scene.querySelector("[data-next], [data-submit]")?.click();
+  }
+  // number keys pick options when not typing
+  if (/^[1-9]$/.test(e.key) && !["INPUT", "TEXTAREA"].includes(e.target.tagName)) {
+    const btn = scene.querySelectorAll(".opt")[+e.key - 1];
+    if (btn) btn.click();
+  }
+});
+
+// ---------- Submit to Google Form ----------
+async function submit(btn) {
+  const scene = scenes[idx];
+  if (!validate(scene)) return;
+  const data = new URLSearchParams();
+  QUESTIONS.forEach(q => {
+    const a = answers[q.id] || {};
+    const key = "entry." + q.entry;
+    if (q.type === "short" || q.type === "long") {
+      if ((a.text || "").trim()) data.append(key, a.text.trim());
+    } else {
+      (a.chosen || []).forEach(v => {
+        if (v === "Other") {
+          data.append(key, "__other_option__");
+          data.append(key + ".other_option_response", (a.other || "").trim());
+        } else data.append(key, v);
+      });
+    }
+  });
+  btn.disabled = true;
+  btn.textContent = T("sending");
+  try {
+    // Google Forms doesn't send CORS headers, so the response is opaque; a network failure still throws.
+    await fetch(FORM_ACTION, { method: "POST", mode: "no-cors", body: data });
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    show(idx + 1);
+    setTimeout(() => document.getElementById("door").classList.add("open"), 900);
+  } catch (err) {
+    setError(scene, "errNetwork");
+    btn.disabled = false;
+    btn.textContent = T("send");
+  }
+}
+
+// ---------- Lightbox ----------
+const lb = document.getElementById("lightbox");
+const lbImg = lb.querySelector("img");
+const closeLb = () => { lb.classList.remove("show", "zoomed"); document.body.classList.remove("no-scroll"); };
+document.getElementById("sketchImg").addEventListener("click", () => {
+  lb.classList.add("show"); document.body.classList.add("no-scroll"); lb.scrollTo(0, 0);
+});
+lbImg.addEventListener("click", e => {
+  // zoom toward the tapped point so the detail you tapped stays in view
+  const r = lbImg.getBoundingClientRect();
+  const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+  lb.classList.toggle("zoomed");
+  if (lb.classList.contains("zoomed")) {
+    const z = lbImg.getBoundingClientRect();
+    lb.scrollTo(lbImg.offsetLeft + fx * z.width - lb.clientWidth / 2, lbImg.offsetTop + fy * z.height - lb.clientHeight / 2);
+  } else lb.scrollTo(0, 0);
+});
+lb.addEventListener("click", e => { if (e.target === lb || e.target.classList.contains("frame") || e.target.closest(".close")) closeLb(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && lb.classList.contains("show")) closeLb(); });
+
+// ---------- Starry sky ----------
+const cv = document.getElementById("sky"), ctx = cv.getContext("2d");
+let stars = [], W, H;
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function resize() {
+  const dpr = devicePixelRatio || 1;
+  W = innerWidth; H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  stars = Array.from({ length: Math.round(W * H / 5000) }, () => ({
+    x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.3 + .2,
+    p: Math.random() * Math.PI * 2, s: Math.random() * .02 + .005, v: Math.random() * .08 + .02,
+  }));
+}
+let mx = 0, my = 0;
+addEventListener("pointermove", e => { mx = (e.clientX / W - .5); my = (e.clientY / H - .5); });
+function frame() {
+  ctx.clearRect(0, 0, W, H);
+  for (const s of stars) {
+    s.p += s.s; s.y -= s.v; if (s.y < -2) { s.y = H + 2; s.x = Math.random() * W; }
+    const a = .35 + Math.sin(s.p) * .35 + .3;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#f6f4e9";
+    ctx.beginPath();
+    ctx.arc(s.x + mx * s.r * 14, s.y + my * s.r * 14, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (!still) requestAnimationFrame(frame);
+}
+addEventListener("resize", resize);
+resize(); frame();
+</script>
+</body>
+</html>
